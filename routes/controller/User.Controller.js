@@ -22,8 +22,9 @@ router.post("/logout", function (req, res) {
 router.get("/whoIsLoggedIn", auth_middleware, function (request, response) {
     const username = request.session.username;
     //const username = request.username;
-  
-    return response.send(username);
+    if (username) {
+      return response.status(200).send(username);
+    }
   });
   
   router.get("/whoIsLoggedInButWithoutMiddleware", function (request, response) {

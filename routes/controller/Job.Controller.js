@@ -16,10 +16,19 @@ router.get("/myJob", auth_middleware, function (request, response) {
     .catch((error) => response.status(400).send(error));
 });
 
-router.get("/find/:title", function (req, res) {
+router.get("/findById/:id", function( req, res) {
+  const jobQuery = req.params.id;
+  return JobAccessor.findJobById(jobQuery)
+  .then((foundJob) => res.status(200).send(foundJob))
+  .catch((error) => console.error(`Something went wrong: ${error}`));
+})
+
+
+
+router.get("/find/:keyWord", function (req, res) {
   const jobQuery = req.params.title;
   const re = new RegExp(jobQuery, "i");
-  return JobAccessor.findJobByTitle(re)
+  return JobAccessor.findJobByKeyWord(re)
     .then((foundJob) => 
       // if (!foundJob) {
       //   return res.status(404).send("No job found!");

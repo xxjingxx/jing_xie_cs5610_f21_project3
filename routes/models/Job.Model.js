@@ -11,9 +11,14 @@ function getAllJob() {
     return JobModel.find().exec();
 }
 
-function findJobByTitle(title) {
+function findJobByKeyWord(title) {
     return JobModel.find({title: title}).exec();
 }
+
+// function findJobById(_id) {
+//     return JobModel.find({_id : _id}).exec();
+// }
+
 
 function findJobMatchesAllFields(job) {
     return JobModel.find({title: job.title,
@@ -25,7 +30,8 @@ function findJobMatchesAllFields(job) {
 }
 
 function findJobById(id) {
-    return JobModel.findById({id}).exec();
+    const _id = mongoose.Types.ObjectId(id);
+    return JobModel.findById({_id}).exec();
 }
 
 function findJobByOwner(owner) {
@@ -41,10 +47,10 @@ function deleteJobById(id) {
 // Make sure to export a function after you create it!
 module.exports = {
     insertJob,
-    findJobByTitle,
     getAllJob,
     findJobById,
     deleteJobById,
     findJobMatchesAllFields,
-    findJobByOwner
+    findJobByOwner,
+    findJobByKeyWord,
 };

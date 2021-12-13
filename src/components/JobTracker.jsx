@@ -16,17 +16,19 @@ export default function JobTracker(props) {
 
   const [myJob, setMyJob] = useState([]);
 
+  const [userName, setUserName] = useState("");
+
   function getMyJob() {
     axios
       .get("/api/job/myJob")
       .then((response) =>
         setMyJob({
-          title: response.data.foundJob[0].title,
-          company: response.data.foundJob[0].company,
-          location: response.data.foundJob[0].location,
-          description: response.data.foundJob[0].description,
-          email: response.data.foundJob[0].email,
-          website: response.data.foundJob[0].website,
+          // title: response.data.foundJob[0].title,
+          // company: response.data.foundJob[0].company,
+          // location: response.data.foundJob[0].location,
+          // description: response.data.foundJob[0].description,
+          // email: response.data.foundJob[0].email,
+          // website: response.data.foundJob[0].website,
         })
       )
       .catch((error) => console.log(error));
@@ -34,14 +36,20 @@ export default function JobTracker(props) {
 
   function checkLogin() {
     axios
-      .get("/api/job/whoIsLoggedIn")
-      .then(() => console.log("Success"))
+      .get("/api/user/whoIsLoggedIn")
+      .then((response) => {
+        console.log(response.data);
+        setUserName(response.data);
+        console.log(userName);
+        console.log("Success")
+      })
       .catch(() => navigate("/"));
   }
 
+  useEffect(checkLogin, [userName]);
   useEffect(getMyJob, []);
 
-  useEffect(checkLogin, []);
+ 
 
   const jobElement = [];
   for (let job in myJob) {
@@ -55,6 +63,9 @@ export default function JobTracker(props) {
 
   return (
     <div>
+      <div>
+        Welcome {userName}
+      </div>
       <h5>Job Title: </h5>
       <input
         value={jobForm.name}

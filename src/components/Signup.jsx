@@ -5,6 +5,16 @@ import { useNavigate } from "react-router";
 export default (props) => {
   const navigate = useNavigate();
 
+  // useEffect(() => 
+  // {
+  //   axios
+  //     .get("/api/user/whoIsLoggedIn")
+  //     .then((response) => {
+  //       setLoggedInName( response.data);
+  //     })
+  //     .catch((error) => console.log(error));}, loggedInName
+  // );
+
   const [userData, setUserData] = useState({
     password: "",
     username: "",
@@ -12,9 +22,19 @@ export default (props) => {
 
   const [loggedInName, setLoggedInName] = useState("");
 
+  const getLogInName = () => {
+    axios
+      .get("/api/user/whoIsLoggedIn")
+      .then((response) => {
+        setLoggedInName( response.data);
+      })
+      .catch((error) => console.log(error));
+  };
+
+
   return (
     <div>
-      <h3>Please sign in</h3>
+      <h3>Create a new account</h3>
       <h5>Username:</h5>
       <input
         value={userData.username}
@@ -38,29 +58,17 @@ export default (props) => {
         }}
         type="password"
       />
+
       <div>
         <button
           onClick={() => {
             axios
-              .post("/api/user/authenticate", userData)
-              .then((response) => {
-                console.log(response);
-              })
+              .post("/api/user/", userData)
+              .then(() => navigate("/"))
               .catch((error) => console.log(error));
           }}
         >
-          Sign in
-        </button>
-      </div>
-
-      <div>
-      New user? 
-        <button
-          onClick={() => 
-            navigate("/register")
-          }
-        >
-        register
+          register
         </button>
       </div>
 
@@ -69,14 +77,21 @@ export default (props) => {
           onClick={() => {
             axios
               .get("/api/user/whoIsLoggedIn")
-              .then((response) => setLoggedInName(response.data))
+              .then((response) => {
+                // console.log(loggedInName);
+                setLoggedInName(prev => ([response.data]));
+                // console.log(response);
+                console.log(response.data);
+                console.log(loggedInName);
+                // console.log(loggedInName);
+              })
               .catch((error) => console.log(error));
           }}
         >
           Who is logged in
         </button>
       </div>
-
+      {/* {getLogInName()} */}
       {loggedInName && <div>{loggedInName}</div>}
     </div>
   );

@@ -14,7 +14,7 @@ export default (props) => {
 
   return (
     <div>
-      <h3>Create a new account</h3>
+      <h3>Please sign in</h3>
       <h5>Username:</h5>
       <input
         value={userData.username}
@@ -38,17 +38,31 @@ export default (props) => {
         }}
         type="password"
       />
-
       <div>
         <button
           onClick={() => {
             axios
-              .post("/api/user/", userData)
-              .then(() => navigate("/"))
+              .post("/api/user/authenticate", userData)
+              .then((response) => {
+                console.log(response.data);
+                navigate("/")
+                window.location.reload(false)
+              })
               .catch((error) => console.log(error));
           }}
         >
-          register
+          Sign in
+        </button>
+      </div>
+
+      <div>
+      New user? 
+        <button
+          onClick={() => 
+            navigate("/signup")
+          }
+        >
+        Sign up
         </button>
       </div>
 
@@ -57,14 +71,22 @@ export default (props) => {
           onClick={() => {
             axios
               .get("/api/user/whoIsLoggedIn")
-              .then((response) => setLoggedInName(response.data))
+              .then((response) => 
+              {
+                console.log(loggedInName)
+                setLoggedInName(response.data)
+                console.log(response)
+                console.log(response.data)
+                console.log(loggedInName)
+                
+
+              })
               .catch((error) => console.log(error));
           }}
         >
           Who is logged in
         </button>
       </div>
-
       {loggedInName && <div>{loggedInName}</div>}
     </div>
   );
