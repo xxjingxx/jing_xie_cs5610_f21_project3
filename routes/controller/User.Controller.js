@@ -2,9 +2,9 @@ const { response } = require("express");
 const express = require("express");
 const router = express.Router();
 const UserModel = require("../models/User.Model");
-const jwt = require("jsonwebtoken");
 const auth_middleware = require("../auth_middleware.js");
 const UserAccessor = require("../models/User.Model");
+const bcrypt = require("bcryptjs");
 
 // Returns all known jobs
 router.get("/findAll", function (request, response) {
@@ -74,8 +74,6 @@ router.get("/:username", (request, response) => {
 
 router.post("/authenticate", function (request, response) {
   let { username, password } = request.body;
-  //password = JSON.stringify(password);
-  //console.log(password);
   if (!username || !password) {
     return response.status(422).send("Must include both password and username");
   }
@@ -85,24 +83,27 @@ router.post("/authenticate", function (request, response) {
       if (!userResponse) {
         return response.status(404).send("No user found with that username");
       }
-      if (userResponse.password === password) {
+
+      if (bcrypt.compareSync(password, userResponse.password)) {
         console.log(password);
         request.session.username = username;
-        return response.status(200).send({ username });
-      } else {
-        return response.status(404).send("No user found with that password");
-      }
+        return response.status(200).send(username);
+    } else {
+      return response.status(404).send("No user found with that password");
+    }
     })
     .catch((error) => console.error(`Something went wrong: ${error}`));
 });
 
 router.post("/", function (req, res) {
-  const { username, password } = req.body;
+  let { username, password } = req.body;
   if (!username || !password) {
     return res
       .status(422)
       .send("Missing username: " + username + "or password:" + password);
   }
+
+  password = bcrypt.hashSync(password, 4);
 
   return UserModel.insertUser({ username, password })
     .then((userResponse) => {

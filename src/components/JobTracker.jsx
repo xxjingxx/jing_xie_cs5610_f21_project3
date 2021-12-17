@@ -18,13 +18,6 @@ export default function JobTracker(props) {
   const [myJob, setMyJob] = useState([]);
   const [userName, setUserName] = useState("");
 
-  function getMyJob() {
-    axios
-      .get("/api/job/myJob")
-      .then((response) => setMyJob({}))
-      .catch((error) => console.log(error));
-  }
-
   function checkLogin() {
     axios
       .get("/api/user/whoIsLoggedIn")
@@ -38,7 +31,7 @@ export default function JobTracker(props) {
   }
 
   useEffect(checkLogin, [userName]);
-  useEffect(getMyJob, []);
+
   const jobElement = [];
   for (let job in myJob) {
     jobElement.push(
@@ -52,10 +45,10 @@ export default function JobTracker(props) {
   function handlePost() {
     if (
       jobForm.title === "" ||
-      jobForm.Company === "" ||
-      jobForm.Location === "" ||
-      jobForm.Description === "" ||
-      jobForm.Email === ""
+      jobForm.company === "" ||
+      jobForm.location === "" ||
+      jobForm.description === "" ||
+      jobForm.email === ""
     ) {
       setError("You must fill out all the required parts.");
       return;

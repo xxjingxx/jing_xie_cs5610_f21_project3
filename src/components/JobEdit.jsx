@@ -23,19 +23,20 @@ export default function JobEdit(props) {
   function handleReplace() {
     if (
       jobForm.title === "" ||
-      jobForm.Company === "" ||
-      jobForm.Location === "" ||
-      jobForm.Description === "" ||
-      jobForm.Email === ""
+      jobForm.company === "" ||
+      jobForm.location === "" ||
+      jobForm.description === "" ||
+      jobForm.email === ""
     ) {
       setError("You must fill out all the required parts.");
       return;
-    }
-    axios
+    } else {
+      axios
       .post("/api/job/replace/" + id, jobForm)
       .catch((error) => setError(error))
       .then(navigate("/user/" + userName))
       .catch((error) => setError(error));
+    }
   }
 
   function getJob() {
