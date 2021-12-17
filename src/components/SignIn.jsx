@@ -1,8 +1,9 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router";
+import { FormBox } from "./PageStyle";
 
-export default (props) => {
+export default () => {
   const navigate = useNavigate();
 
   const [userData, setUserData] = useState({
@@ -13,7 +14,7 @@ export default (props) => {
   const [loggedInName, setLoggedInName] = useState("");
 
   return (
-    <div>
+    <FormBox>
       <h3>Please sign in</h3>
       <h5>Username:</h5>
       <input
@@ -45,8 +46,8 @@ export default (props) => {
               .post("/api/user/authenticate", userData)
               .then((response) => {
                 console.log(response.data);
-                navigate("/")
-                window.location.reload(false)
+                navigate("/");
+                window.location.reload(false);
               })
               .catch((error) => console.log(error));
           }}
@@ -56,30 +57,17 @@ export default (props) => {
       </div>
 
       <div>
-      New user? 
-        <button
-          onClick={() => 
-            navigate("/signup")
-          }
-        >
-        Sign up
-        </button>
+        New user?
+        <button onClick={() => navigate("/signup")}>Sign up</button>
       </div>
 
-      <div>
+      {/* <div>
         <button
           onClick={() => {
             axios
               .get("/api/user/whoIsLoggedIn")
-              .then((response) => 
-              {
-                console.log(loggedInName)
-                setLoggedInName(response.data)
-                console.log(response)
-                console.log(response.data)
-                console.log(loggedInName)
-                
-
+              .then((response) => {
+                setLoggedInName(response.data);
               })
               .catch((error) => console.log(error));
           }}
@@ -87,7 +75,7 @@ export default (props) => {
           Who is logged in
         </button>
       </div>
-      {loggedInName && <div>{loggedInName}</div>}
-    </div>
+      {loggedInName && <div>{loggedInName}</div>} */}
+    </FormBox>
   );
 };

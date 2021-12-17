@@ -16,24 +16,24 @@ router.get("/myJob", auth_middleware, function (request, response) {
     .catch((error) => response.status(400).send(error));
 });
 
-router.get("/findById/:id", function( req, res) {
+router.get("/findById/:id", function (req, res) {
   const jobQuery = req.params.id;
   return JobAccessor.findJobById(jobQuery)
-  .then((foundJob) => res.status(200).send(foundJob))
-  .catch((error) => console.error(`Something went wrong: ${error}`));
-})
-
-
+    .then((foundJob) => res.status(200).send(foundJob))
+    .catch((error) => console.error(`Something went wrong: ${error}`));
+});
 
 router.get("/find/:keyWord", function (req, res) {
-  const jobQuery = req.params.title;
+  const jobQuery = req.params.keyWord;
   const re = new RegExp(jobQuery, "i");
   return JobAccessor.findJobByKeyWord(re)
-    .then((foundJob) => 
-      // if (!foundJob) {
-      //   return res.status(404).send("No job found!");
-      // };
-      res.status(200).send(foundJob))
+    .then((foundJob) => {
+      if (!foundJob) {
+        return res.status(404).send("No job found!");
+      }
+      res.status(200).send(foundJob);
+    })
+
     .catch((error) => console.error(`Something went wrong: ${error}`));
 });
 
@@ -43,7 +43,7 @@ router.post("/create", auth_middleware, (request, response) => {
     newJob;
   console.log(request.body);
   if (!title || !company || !location || !description || !email) {
-    return response.status(422).send("Missing data");
+    return response.status(402).send("Missing data");
   }
   newJob.owner = request.username;
   return JobAccessor.findJobMatchesAllFields(newJob).then((jobResponse) => {
@@ -87,4 +87,4 @@ router.get("/about", function (req, res) {
   res.send("Food is the best");
 });
 
-module.exports = router; // <== Look at our new friend, module.exports!
+module.exports = router;

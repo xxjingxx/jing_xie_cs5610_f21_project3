@@ -4,6 +4,7 @@ const router = express.Router();
 const UserModel = require("../models/User.Model");
 const jwt = require("jsonwebtoken");
 const auth_middleware = require("../auth_middleware.js");
+const UserAccessor = require("../models/User.Model");
 
 // Returns all known jobs
 router.get("/findAll", function (request, response) {
@@ -15,30 +16,51 @@ router.get("/findAll", function (request, response) {
 });
 
 router.post("/logout", function (req, res) {
-  req.session.destroy()
+  req.session.destroy();
   return res.send("ok");
 });
 
+router.post("/addFavorite", auth_middleware, function (request, response) {
+  const job = request.body;
+  const username = request.session.username;
+  UserAccessor.addToFavorite(username, job)
+    .then(response.send("Success!"))
+    .catch((error) => response.status(400).send(error));
+});
+
+router.delete("/deleteFavorite", auth_middleware, function (request, response) {
+  const jobId = request.body;
+  const username = request.session.username;
+  UserAccessor.deleteFavorite(username, jobId)
+    .then(response.send("Success!"))
+    .catch((error) => response.status(400).send(error));
+});
+
+router.get("/myFavorite", auth_middleware, function (request, response) {
+  const username = request.session.username;
+  return UserModel.findUserByUsername(username)
+    .then((userResponse) => response.status(200).send(userResponse.favorites))
+    .catch((error) => console.error(`Something went wrong: ${error}`));
+});
+
 router.get("/whoIsLoggedIn", auth_middleware, function (request, response) {
-    const username = request.session.username;
-    //const username = request.username;
-    if (username) {
-      return response.status(200).send(username);
-    }
-  });
-  
-  router.get("/whoIsLoggedInButWithoutMiddleware", function (request, response) {
-    const username = request.session.username;
-  
-    return response.send(username);
-  });
+  const username = request.session.username;
+  if (username) {
+    return response.status(200).send(username);
+  }
+});
+
+router.get("/whoIsLoggedInButWithoutMiddleware", function (request, response) {
+  const username = request.session.username;
+
+  return response.send(username);
+});
 
 router.get("/:username", (request, response) => {
   const username = request.params.username;
   if (!username) {
     return response.status(422).send("Missing data");
   }
-
   return UserModel.findUserByUsername(username)
     .then((userResponse) => {
       if (!userResponse) {
@@ -48,11 +70,7 @@ router.get("/:username", (request, response) => {
       response.send(userResponse);
     })
     .catch((error) => response.status(500).send("Issue getting user"));
-
-  // response.send("Success!")
 });
-
-
 
 router.post("/authenticate", function (request, response) {
   let { username, password } = request.body;
@@ -62,72 +80,24 @@ router.post("/authenticate", function (request, response) {
     return response.status(422).send("Must include both password and username");
   }
 
-  return (
-    UserModel.findUserByUsername(username)
-      .then((userResponse) => {
-        if (!userResponse) {
-          return response.status(404).send("No user found with that username");
-        }
-        if (userResponse.password === password) {
-          console.log(password);
-        //   const payload = { username: username };
-
-        //   const token = jwt.sign(payload, "SUPER_DUPER_SECRET", {
-        //     expiresIn: "14d",
-        //   });
-          request.session.username = username;
-          //request.username = username;
-        //   return response
-        //     .cookie("huntersCookie", token, { httpOnly: true })
-        //     .status(200)
-        //     .send({ username });
-        return response.status(200).send({username});
-
-          // return response.status(200).send("User is logged in!")
-        } else {
-          return response.status(404).send("No user found with that password");
-        }
-      })
-
-      //     // user.comparePassword(password, (error, match) => {
-      //         if (match) {
-      //             const payload = {username};
-      //             // JWT is encrypting our payload (which is whatever data we want
-      //             // to carry across sessions: in this case, just the username)
-      //             // into the cookie based on our SECRET
-      //             const token = jwt.sign(payload, process.env.SUPER_SECRET, {
-      //                 expiresIn: '14d' // optional cookie expiration date
-      //             });
-      //             // Here we are setting the cookie on our response obect.
-      //             // Note that we are returning the username, but that isn't as necessary anymore
-      //             // unless we want to reference that on the frontend
-      //             return res.cookie('token', token, {httpOnly: true})
-      //                 .status(200).send({username});
-      //         }
-      //         return res.status(400).send("The password does not match");
-      //     });
-      // })
-      .catch((error) => console.error(`Something went wrong: ${error}`))
-  );
-
-  // return UserModel.findUserByUsername(username)
-  //     .then((userResponse) => {
-  //         if (!userResponse) {
-  //             return response.status(404).send("No user found with that username");
-  //         }
-  //         if (userResponse.password === password) {
-  //             return response.status(200).send("User is logged in!")
-  //         } else {
-  //             return response.status(404).send("No user found with that password");
-  //         }
-  //     })
-  //     .catch(error => res.status(400).send(error))
+  return UserModel.findUserByUsername(username)
+    .then((userResponse) => {
+      if (!userResponse) {
+        return response.status(404).send("No user found with that username");
+      }
+      if (userResponse.password === password) {
+        console.log(password);
+        request.session.username = username;
+        return response.status(200).send({ username });
+      } else {
+        return response.status(404).send("No user found with that password");
+      }
+    })
+    .catch((error) => console.error(`Something went wrong: ${error}`));
 });
 
 router.post("/", function (req, res) {
   const { username, password } = req.body;
-  // const username = req.body.username
-  // const password = req.body.password
   if (!username || !password) {
     return res
       .status(422)
@@ -140,7 +110,5 @@ router.post("/", function (req, res) {
     })
     .catch((error) => res.status(400).send(error));
 });
-
-
 
 module.exports = router;

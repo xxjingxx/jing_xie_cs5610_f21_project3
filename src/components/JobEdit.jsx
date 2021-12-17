@@ -1,10 +1,15 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
+import { useParams } from "react-router";
 import { useNavigate } from "react-router";
-import { FormBox, Div } from "./PageStyle";
+import { FormBox, Div, JobBox } from "./PageStyle";
 
-export default function JobTracker(props) {
+export default function JobEdit(props) {
   const navigate = useNavigate();
+  const id = useParams().id;
+  const [job, setJob] = useState(null);
+  useEffect(getJob, [job]);
+  const jobElement = [];
   const [errorMsg, setError] = useState(null);
   const [jobForm, setJobForm] = useState({
     title: "",
@@ -15,41 +20,7 @@ export default function JobTracker(props) {
     website: "",
   });
 
-  const [myJob, setMyJob] = useState([]);
-  const [userName, setUserName] = useState("");
-
-  function getMyJob() {
-    axios
-      .get("/api/job/myJob")
-      .then((response) => setMyJob({}))
-      .catch((error) => console.log(error));
-  }
-
-  function checkLogin() {
-    axios
-      .get("/api/user/whoIsLoggedIn")
-      .then((response) => {
-        console.log(response.data);
-        setUserName(response.data);
-        console.log(userName);
-        console.log("Success");
-      })
-      .catch(() => navigate("/"));
-  }
-
-  useEffect(checkLogin, [userName]);
-  useEffect(getMyJob, []);
-  const jobElement = [];
-  for (let job in myJob) {
-    jobElement.push(
-      <div>
-        {job.title} {job.company} {job.location} {job.description} {job.email}
-        {job.website}
-      </div>
-    );
-  }
-
-  function handlePost() {
+  function handleReplace() {
     if (
       jobForm.title === "" ||
       jobForm.Company === "" ||
@@ -61,15 +32,62 @@ export default function JobTracker(props) {
       return;
     }
     axios
-      .post("/api/job/create", jobForm)
+      .post("/api/job/replace/" + id, jobForm)
       .catch((error) => setError(error))
       .then(navigate("/user/" + userName))
       .catch((error) => setError(error));
   }
 
+  function getJob() {
+    axios
+      .get("/api/job/findById/" + id)
+      .then((response) => {
+        console.log(id);
+        setJob(response.data);
+        console.log(job);
+      })
+      .catch((error) => console.log("Could not find Job"));
+    if (job) {
+      jobElement.push(
+        <JobBox>
+          <div>Title: {job.title}</div>
+          <div>Company: {job.company}</div>
+          <div>Location: {job.location}</div>
+          <div>Description: {job.description}</div>
+          <div>Email: {job.email}</div>
+          {job.website ? (
+            <>
+              <div>Website: {job.website}</div>
+            </>
+          ) : (
+            <></>
+          )}
+          <div>Post Date: {job.postDate}</div>
+        </JobBox>
+      );
+    }
+  }
+
+  const [userName, setUserName] = useState("");
+  function checkLogin() {
+    axios
+      .get("/api/user/whoIsLoggedIn")
+      .then((response) => {
+        console.log(response.data);
+        setUserName(response.data);
+        console.log(userName);
+        console.log("Success");
+      })
+      .catch(() => navigate("/"));
+  }
+  useEffect(checkLogin, [userName]);
+
   return (
     <FormBox>
-      <Div>Welcome {userName}, post a new job here</Div>
+      {getJob()}
+      <>Here is the job you want to edit:</>
+      {jobElement}
+      <Div>Edit job by filling out this form</Div>
       <div>
         <span style={{ color: `#ff0000`, fontStyle: `italic` }}>
           *: required
@@ -147,7 +165,7 @@ export default function JobTracker(props) {
       ></input>
       <div style={{ color: `#ff0000` }}>{errorMsg}</div>
       <Div>
-        <button onClick={() => handlePost()}>Submit</button>
+        <button onClick={() => handleReplace()}>Submit</button>
       </Div>
     </FormBox>
   );

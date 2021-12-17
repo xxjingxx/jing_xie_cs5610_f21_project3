@@ -1,6 +1,7 @@
-const Schema = require('mongoose').Schema;
+const Schema = require("mongoose").Schema;
 
-exports.JobSchema = new Schema({
+exports.JobSchema = new Schema(
+  {
     title: String,
     company: String,
     location: String,
@@ -9,8 +10,9 @@ exports.JobSchema = new Schema({
     website: String,
     owner: String,
     postDate: {
-        type: Date,
-        default: Date.now,
+      type: Date,
+      default: Date.now,
     },
-// this explicitly declares what collection we're using
-}, { collection : 'jobs' });
+  },
+  { collection: "jobs" }
+);

@@ -26,6 +26,14 @@ export const Bars = styled(FaBars)`
     cursor: pointer;
   }
 `;
+
+export const Icon = styled.div`
+  display: flex;
+  // font-family: Arial, Helvetica, sans-serif;
+  font-family: Fantacy, Chalkduster;
+  color: rgb(73, 102, 146);
+  font-weight: bold
+`
   
 export const NavLink = styled(Link)`
   color: #808080;

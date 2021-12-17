@@ -9,25 +9,23 @@ import {
   NavMenu,
   NavBtn,
   NavBtnLink,
-} from "./NavbarElements";
+  Icon,
+} from "./NavbarStyle";
 
 export default function NavBar() {
   const navigate = useNavigate();
   const [userName, setUserName] = useState("");
 
   function checkLogin() {
-    //let isMounted = true;
     axios
       .get("/api/user/whoIsLoggedIn")
       .then((response) => {
-        //if (isMounted)
         console.log(response.data);
         setUserName(response.data);
         console.log(userName);
         console.log("Success");
       })
       .catch((error) => console.log(error));
-    //return () =>{isMounted = false}
   }
 
   useEffect(checkLogin, [userName]);
@@ -38,13 +36,10 @@ export default function NavBar() {
         <Nav>
           <Bars />
           <NavMenu>
+            <Icon>Minions Job Board</Icon>
             <NavLink to="/" activeStyle>
               Home
             </NavLink>
-            <NavLink to="/post" activeStyle>
-              Post
-            </NavLink>
-
             <NavLink to="/signup" activeStyle>
               Sign Up
             </NavLink>
@@ -59,19 +54,25 @@ export default function NavBar() {
         <Nav>
           <Bars />
           <NavMenu>
+            <Icon>Minions Job Board</Icon>
             <NavLink to="/" activeStyle>
               Home
+            </NavLink>
+            <NavLink to="/signup" activeStyle>
+              Sign Up
             </NavLink>
             <NavLink to="/post" activeStyle>
               Post
             </NavLink>
-
-            <NavLink to="/signup" activeStyle>
-              Sign Up
+            <NavLink to={"/user/" + userName + "/favorite"} activeStyle>
+              Favorite
+            </NavLink>
+            <NavLink to={"/user/" + userName} activeStyle>
+              My jobs
             </NavLink>
           </NavMenu>
           <NavBtn>
-            <NavLink to="/">{userName}</NavLink>
+            <NavLink to={"/user/" + userName}>{userName}</NavLink>
             <button
               onClick={() =>
                 axios
@@ -89,6 +90,5 @@ export default function NavBar() {
         </Nav>
       </>
     );
-
   return <>{navBar}</>;
 }

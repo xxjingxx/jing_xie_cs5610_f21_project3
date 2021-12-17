@@ -1,19 +1,10 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router";
+import { FormBox } from "./PageStyle";
 
-export default (props) => {
+export default () => {
   const navigate = useNavigate();
-
-  // useEffect(() => 
-  // {
-  //   axios
-  //     .get("/api/user/whoIsLoggedIn")
-  //     .then((response) => {
-  //       setLoggedInName( response.data);
-  //     })
-  //     .catch((error) => console.log(error));}, loggedInName
-  // );
 
   const [userData, setUserData] = useState({
     password: "",
@@ -26,14 +17,13 @@ export default (props) => {
     axios
       .get("/api/user/whoIsLoggedIn")
       .then((response) => {
-        setLoggedInName( response.data);
+        setLoggedInName(response.data);
       })
       .catch((error) => console.log(error));
   };
 
-
   return (
-    <div>
+    <FormBox>
       <h3>Create a new account</h3>
       <h5>Username:</h5>
       <input
@@ -72,18 +62,15 @@ export default (props) => {
         </button>
       </div>
 
-      <div>
+      {/* <div>
         <button
           onClick={() => {
             axios
               .get("/api/user/whoIsLoggedIn")
               .then((response) => {
-                // console.log(loggedInName);
                 setLoggedInName(prev => ([response.data]));
-                // console.log(response);
                 console.log(response.data);
                 console.log(loggedInName);
-                // console.log(loggedInName);
               })
               .catch((error) => console.log(error));
           }}
@@ -91,8 +78,7 @@ export default (props) => {
           Who is logged in
         </button>
       </div>
-      {/* {getLogInName()} */}
-      {loggedInName && <div>{loggedInName}</div>}
-    </div>
+      {loggedInName && <div>{loggedInName}</div>} */}
+    </FormBox>
   );
 };
